@@ -6,7 +6,7 @@ const pool = { query: jest.fn(async (sql) => {
   if (sql.startsWith('SELECT id, name FROM equipos')) return { rows: [{ id: 1, name: 'Real Madrid' }] };
   if (sql.includes('INNER JOIN')) return { rows: [{ name: 'Jugador Uno', posicion: 'delantero' }] };
   if (sql.startsWith('INSERT INTO equipos')) return { rows: [{ id: 2, name: 'Barcelona' }] };
-  return { rows: [{ id: 1, name: 'Jugador Uno', position: 4, id_equipos: 1 }] };
+  return { rows: [{ id: 1, name: 'Jugador Uno', position: 4, id_equipo: 1 }] };
 }) };
 const app = createApp({ pool, secretKey: 'clave-super-segura-para-pruebas-1234567890' });
 
@@ -40,4 +40,17 @@ test('GET /equipos/:teamID/jugadores devuelve posición mediante INNER JOIN', as
   const res = await request(app).get('/equipos/1/jugadores');
   expect(res.status).toBe(200);
   expect(res.body[0]).toEqual({ name: 'Jugador Uno', posicion: 'delantero' });
+});
+test('la consulta de jugadores utiliza la relación id_equipo del esquema oficial', async () => {
+  pool.query.mockClear();
+  await request(app).get('/equipos/1/jugadores');
+  expect(pool.query).toHaveBeenCalledWith(expect.stringContaining('j.id_equipo = e.id'), ['1']);
+});
+test('la inserción de jugadores usa la columna id_equipo del esquema oficial', async () => {
+  pool.query.mockClear();
+  const login = await request(app).post('/login').send({ username: 'admin', password: '1234' });
+  const res = await request(app).post('/equipos/1/jugadores').set('Authorization', `Bearer ${login.body.token}`)
+    .send({ name: 'Nuevo jugador', posicion: 'delantero' });
+  expect(res.status).toBe(201);
+  expect(pool.query).toHaveBeenCalledWith(expect.stringContaining('INSERT INTO jugadores (id_equipo, position, name)'), [1, -1, 'delantero', 'Nuevo jugador']);
 });
