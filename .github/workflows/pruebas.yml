@@ -1,0 +1,22 @@
+name: Comprobación automática
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+jobs:
+  pruebas:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Obtener código
+        uses: actions/checkout@v4
+      - name: Preparar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Instalar dependencias
+        run: npm install --no-audit --no-fund
+      - name: Comprobar sintaxis
+        run: find . -path './node_modules' -prune -o -name '*.js' -print -exec node --check {} \;
+      - name: Ejecutar pruebas
+        run: npm test
