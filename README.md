@@ -56,6 +56,8 @@ Acepto la posición como nombre o identificador. Uso consultas SQL parametrizada
 
 ## Pruebas
 
+También ejecuto pruebas con PostgreSQL real para comprobar el registro y listado de equipos, inserción de jugadores y consulta INNER JOIN con autorización JWT.
+
 Escribí ocho pruebas con Jest y Supertest para comprobar las rutas de equipos y jugadores, el inicio de sesión, la protección mediante JWT y las consultas SQL con la relación `jugadores.id_equipo`.
 
 ```bash
