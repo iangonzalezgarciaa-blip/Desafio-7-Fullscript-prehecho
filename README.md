@@ -56,25 +56,17 @@ Acepto la posición como nombre o identificador. Uso consultas SQL parametrizada
 
 ## Pruebas
 
-Agregué los cuatro casos requeridos en el PDF: listado de equipos HTTP 200, login correcto con objeto JWT, login incorrecto HTTP 400 y creación de jugador con JWT HTTP 201. Incorporé además pruebas para la protección de equipos y para el listado de jugadores.
-
-Para los tests simulo la respuesta de la base de datos. La ejecución real con PostgreSQL debe comprobarse configurando una base local.
-
-## Consideraciones
-
-El PDF indica que existe un material de apoyo por separado con el servidor inicial y el archivo `script.sql`. Como ese material no estaba adjunto, armé una implementación autónoma siguiendo las rutas y el esquema relacional que muestra el enunciado. Mi script SQL está incluido en este repositorio.
-
-## Pruebas
-
-Mis pruebas con Jest y Supertest cubren el listado de equipos, inicio de sesión correcto e incorrecto, creación autorizada de jugadores, rechazo de equipos sin token y consulta de jugadores.
-
-Ejecuto las pruebas con:
+Escribí ocho pruebas con Jest y Supertest para comprobar las rutas de equipos y jugadores, el inicio de sesión, la protección mediante JWT y las consultas SQL con la relación `jugadores.id_equipo`.
 
 ```bash
 npm install
 npm test
 ```
 
-**Resultado de GitHub Actions:** ejecución exitosa. [Ver la ejecución de mis pruebas](https://github.com/iangonzalezgarciaa-blip/Desafio-7-Fullscript-prehecho/actions/runs/40827562981).
+Puedo verificar el resultado de la versión actual en [GitHub Actions](https://github.com/iangonzalezgarciaa-blip/Desafio-7-Fullscript-prehecho/actions).
 
-Las pruebas automatizadas no constituyen por sí solas una validación de integración con PostgreSQL o con material de apoyo externo.
+## Base de datos
+
+Adapté `sql/script.sql` al esquema original de FutScript: tablas `equipos`, `posiciones` y `jugadores` relacionadas mediante `jugadores.id_equipo` y `jugadores.position`. Conservo las cuatro posiciones iniciales incluidas en el material oficial.
+
+Las pruebas con una base PostgreSQL en funcionamiento son una comprobación distinta de los tests con base de datos simulada.
