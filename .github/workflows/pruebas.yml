@@ -1,4 +1,4 @@
-name: Comprobación automática
+name: Pruebas con PostgreSQL
 on:
   push:
     branches: [main]
@@ -7,16 +7,28 @@ on:
 jobs:
   pruebas:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: futscript
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgres://postgres:postgres@localhost:5432/futscript
+      JWT_SECRET: clave_de_pruebas_suficientemente_larga_12345
     steps:
-      - name: Obtener código
-        uses: actions/checkout@v4
-      - name: Preparar Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Instalar dependencias
-        run: npm install --no-audit --no-fund
-      - name: Comprobar sintaxis
-        run: find . -path './node_modules' -prune -o -name '*.js' -print -exec node --check {} \;
-      - name: Ejecutar pruebas
-        run: npm test
+      - run: npm install --no-audit --no-fund
+      - run: find . -path './node_modules' -prune -o -name '*.js' -print -exec node --check {} \;
+      - run: npm test
