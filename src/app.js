@@ -46,7 +46,7 @@ export function createApp({ pool, secretKey }) {
       const { rows } = await pool.query(
         `SELECT j.name, p.name AS posicion FROM jugadores AS j
          INNER JOIN posiciones AS p ON j.position = p.id
-         INNER JOIN equipos AS e ON j.id_equipos = e.id
+         INNER JOIN equipos AS e ON j.id_equipo = e.id
          WHERE e.id = $1 ORDER BY j.id`, [req.params.teamID]
       );
       res.status(200).json(rows);
@@ -70,9 +70,9 @@ export function createApp({ pool, secretKey }) {
       return res.status(400).json({ error: 'Nombre y posición obligatorios' });
     }
     try {
-      const sql = `INSERT INTO jugadores (id_equipos, position, name)
+      const sql = `INSERT INTO jugadores (id_equipo, position, name)
         VALUES ($1, (SELECT id FROM posiciones WHERE id = $2 OR LOWER(name) = LOWER($3) LIMIT 1), $4)
-        RETURNING id, id_equipos, position, name`;
+        RETURNING id, id_equipo, position, name`;
       const id = Number.isSafeInteger(Number(posicionRecibida)) && Number(posicionRecibida) > 0 ? Number(posicionRecibida) : -1;
       const { rows } = await pool.query(sql, [Number(req.params.teamID), id, String(posicionRecibida), name.trim()]);
       res.status(201).json(rows[0]);
